@@ -18,7 +18,9 @@ export const createAddress = async (req: AuthRequest, res: Response): Promise<vo
     } = req.body;
 
     if (!fullAddress || !city || !state || !pincode) {
-      res.status(400).json({ message: 'Missing required fields' });
+      res.status(400).json({ 
+        message: 'Missing required fields: fullAddress, city, state, and pincode are required' 
+      });
       return;
     }
 

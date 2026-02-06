@@ -84,6 +84,7 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
     const isPastDate = (day: number) => {
       if (!disablePastDates) return false
       const date = new Date(viewDate.getFullYear(), viewDate.getMonth(), day)
+      date.setHours(0, 0, 0, 0)
       const today = new Date()
       today.setHours(0, 0, 0, 0)
       return date < today
