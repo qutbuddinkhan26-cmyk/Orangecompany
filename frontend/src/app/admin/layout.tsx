@@ -13,6 +13,7 @@ import {
   LogOut,
   Menu,
   X,
+  Ticket,
 } from "lucide-react";
 
 export default function AdminLayout({
@@ -75,6 +76,11 @@ export default function AdminLayout({
       name: "Bookings",
       href: "/admin/bookings",
       icon: Calendar,
+    },
+    {
+      name: "Coupons",
+      href: "/admin/coupons",
+      icon: Ticket,
     },
   ];
 

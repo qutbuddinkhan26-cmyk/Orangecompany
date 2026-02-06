@@ -94,6 +94,12 @@ export default function ServiceDetailPage() {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState("");
   const [selectedAddressId, setSelectedAddressId] = useState("");
   const [specialInstructions, setSpecialInstructions] = useState("");
+  
+  // Coupon state
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+  const [couponError, setCouponError] = useState("");
+  const [couponLoading, setCouponLoading] = useState(false);
 
   // Address dialog state
   const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
@@ -177,6 +183,54 @@ export default function ServiceDetailPage() {
     }
   };
 
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      setCouponError("Please enter a coupon code");
+      return;
+    }
+
+    setCouponLoading(true);
+    setCouponError("");
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/coupons/validate`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            code: couponCode,
+            serviceId: serviceId,
+            orderAmount: discountedPrice,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        setAppliedCoupon(data);
+        setCouponError("");
+      } else {
+        setCouponError(data.message || "Invalid coupon code");
+        setAppliedCoupon(null);
+      }
+    } catch (err: any) {
+      setCouponError("Failed to validate coupon");
+      setAppliedCoupon(null);
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setCouponCode("");
+    setAppliedCoupon(null);
+    setCouponError("");
+  };
+
   const handleBooking = async () => {
     if (!selectedDate || !selectedTimeSlot || !selectedAddressId) {
       alert("Please select date, time slot, and address");
@@ -187,13 +241,20 @@ export default function ServiceDetailPage() {
 
     try {
       const bookingDate = selectedDate.toISOString().split("T")[0];
-      const response = await api.createBooking({
+      const bookingData: any = {
         serviceId,
         bookingDate,
         timeSlot: selectedTimeSlot,
         addressId: selectedAddressId,
         specialInstructions,
-      });
+      };
+
+      if (appliedCoupon) {
+        bookingData.couponId = appliedCoupon.coupon._id;
+        bookingData.discountAmount = appliedCoupon.discountAmount;
+      }
+
+      const response = await api.createBooking(bookingData);
 
       // Redirect to booking details page
       router.push(`/booking/${response.booking._id}`);
@@ -476,6 +537,46 @@ export default function ServiceDetailPage() {
                   />
                 </div>
 
+                {/* Coupon Code */}
+                <div>
+                  <Label htmlFor="coupon">Apply Coupon Code</Label>
+                  <div className="flex gap-2 mt-2">
+                    <Input
+                      id="coupon"
+                      placeholder="Enter coupon code"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                      disabled={appliedCoupon !== null}
+                      className="font-mono"
+                    />
+                    {appliedCoupon ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleRemoveCoupon}
+                      >
+                        Remove
+                      </Button>
+                    ) : (
+                      <Button
+                        type="button"
+                        onClick={handleApplyCoupon}
+                        disabled={couponLoading || !couponCode.trim()}
+                      >
+                        {couponLoading ? "..." : "Apply"}
+                      </Button>
+                    )}
+                  </div>
+                  {couponError && (
+                    <p className="text-sm text-red-600 mt-1">{couponError}</p>
+                  )}
+                  {appliedCoupon && (
+                    <p className="text-sm text-green-600 mt-1">
+                      ✓ Coupon applied! You save {formatPrice(appliedCoupon.discountAmount)}
+                    </p>
+                  )}
+                </div>
+
                 {/* Booking Summary */}
                 {selectedDate && selectedTimeSlot && (
                   <div className="border-t pt-4 space-y-2 text-sm">
@@ -487,10 +588,24 @@ export default function ServiceDetailPage() {
                       <span className="text-gray-600">Time:</span>
                       <span className="font-medium">{selectedTimeSlot}</span>
                     </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Service Amount:</span>
+                      <span className="font-medium">{formatPrice(discountedPrice)}</span>
+                    </div>
+                    {appliedCoupon && (
+                      <div className="flex justify-between text-green-600">
+                        <span>Coupon Discount:</span>
+                        <span>-{formatPrice(appliedCoupon.discountAmount)}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between text-lg font-bold pt-2 border-t">
                       <span>Total:</span>
                       <span className="text-primary">
-                        {formatPrice(discountedPrice)}
+                        {formatPrice(
+                          appliedCoupon
+                            ? appliedCoupon.finalAmount
+                            : discountedPrice
+                        )}
                       </span>
                     </div>
                   </div>
