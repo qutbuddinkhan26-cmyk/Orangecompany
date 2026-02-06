@@ -1,240 +1,55 @@
 "use client";
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Star, Filter, ArrowLeft } from "lucide-react";
+import { Search, Star, Clock, ArrowLeft, Filter } from "lucide-react";
 
-interface Service {
-  _id: string;
-  name: string;
-  description: string;
-  basePrice: number;
-  discountPercentage: number;
-  durationMinutes: number;
-  rating: number;
-  totalBookings: number;
-  thumbnail?: string;
-  categoryId?: {
-    name: string;
-    slug: string;
-  };
-}
+const staticServices = [
+  { _id: "1", name: "Deep Home Cleaning", price: 999, rating: 4.8, reviewCount: 2534, duration: "3-4 hours", image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400", category: "Home Cleaning" },
+  { _id: "2", name: "AC Service & Repair", price: 499, rating: 4.7, reviewCount: 1823, duration: "1-2 hours", image: "https://images.unsplash.com/photo-1631545806609-fa7e4ad5c2e0?w=400", category: "Appliance Repair" },
+  { _id: "3", name: "Salon for Women", price: 799, rating: 4.9, reviewCount: 3421, duration: "2-3 hours", image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400", category: "Beauty & Spa" },
+  { _id: "4", name: "Plumbing Repair", price: 349, rating: 4.6, reviewCount: 987, duration: "1-2 hours", image: "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=400", category: "Plumbing" },
+  { _id: "5", name: "Electrical Work", price: 399, rating: 4.7, reviewCount: 1245, duration: "1-3 hours", image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400", category: "Electrical" },
+  { _id: "6", name: "Pest Control", price: 599, rating: 4.5, reviewCount: 756, duration: "2-3 hours", image: "https://images.unsplash.com/photo-1632935190868-ee68f0e9afb7?w=400", category: "Pest Control" },
+  { _id: "7", name: "Full Home Painting", price: 2999, rating: 4.6, reviewCount: 432, duration: "1-2 days", image: "https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=400", category: "Painting" },
+  { _id: "8", name: "Carpet Cleaning", price: 699, rating: 4.5, reviewCount: 654, duration: "2-3 hours", image: "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=400", category: "Home Cleaning" },
+  { _id: "9", name: "Furniture Assembly", price: 449, rating: 4.4, reviewCount: 321, duration: "1-3 hours", image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400", category: "Carpentry" },
+];
 
 export default function ServicesPage() {
-  const [services, setServices] = useState<Service[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("popular");
-
-  useEffect(() => {
-    fetchServices();
-  }, [sortBy]);
-
-  const fetchServices = async () => {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/services?sort=${sortBy}`
-      );
-      const data = await response.json();
-      if (data.success) {
-        setServices(data.services);
-      }
-    } catch (error) {
-      console.error("Error fetching services:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filteredServices = services.filter((service) =>
-    service.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const calculateFinalPrice = (service: Service) => {
-    const discount = (service.basePrice * service.discountPercentage) / 100;
-    return service.basePrice - discount;
-  };
-
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("popular");
+  const [category, setCategory] = useState("all");
+  const categories = ["all", ...Array.from(new Set(staticServices.map(s => s.category)))];
+  let filtered = staticServices.filter(s => s.name.toLowerCase().includes(search.toLowerCase()) && (category === "all" || s.category === category));
+  if (sort === "price-low") filtered.sort((a, b) => a.price - b.price);
+  else if (sort === "price-high") filtered.sort((a, b) => b.price - a.price);
+  else if (sort === "rating") filtered.sort((a, b) => b.rating - a.rating);
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-50">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="text-2xl font-bold text-primary">
-              ServiceHub
-            </Link>
-            <div className="flex items-center gap-3">
-              <Link href="/login">
-                <Button variant="ghost" size="sm">
-                  Login
-                </Button>
-              </Link>
-              <Link href="/register">
-                <Button size="sm">Sign Up</Button>
-              </Link>
-            </div>
-          </div>
+      <header className="border-b bg-white sticky top-0 z-50"><div className="container mx-auto px-4 py-4 flex items-center justify-between"><Link href="/" className="text-2xl font-bold text-purple-600">ServiceHub</Link><div className="flex items-center gap-3"><Link href="/login"><Button variant="outline">Login</Button></Link><Link href="/register"><Button>Sign Up</Button></Link></div></div></header>
+      <div className="bg-gradient-to-r from-purple-50 to-blue-50 py-10"><div className="container mx-auto px-4"><Link href="/" className="text-purple-600 flex items-center gap-1 mb-4 text-sm"><ArrowLeft className="h-4 w-4" /> Back to Home</Link><h1 className="text-3xl font-bold mb-2">All Services</h1><p className="text-gray-600 mb-6">Browse our complete range of professional home services</p><div className="flex gap-2 max-w-xl"><div className="relative flex-1"><Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" /><Input className="pl-10" placeholder="Search services..." value={search} onChange={e => setSearch(e.target.value)} /></div><Button className="bg-purple-600 hover:bg-purple-700"><Search className="h-4 w-4 mr-2" />Search</Button></div></div></div>
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex flex-wrap items-center gap-3 mb-6">
+          <div className="flex items-center gap-2"><Filter className="h-4 w-4" /><span className="text-sm font-medium">Category:</span></div>
+          {categories.map(c => <button key={c} onClick={() => setCategory(c)} className={`text-sm px-3 py-1 rounded-full border ${category === c ? "bg-purple-600 text-white border-purple-600" : "bg-white hover:border-purple-300"}`}>{c === "all" ? "All" : c}</button>)}
+          <select value={sort} onChange={e => setSort(e.target.value)} className="ml-auto border rounded-lg px-3 py-1.5 text-sm"><option value="popular">Most Popular</option><option value="price-low">Price: Low to High</option><option value="price-high">Price: High to Low</option><option value="rating">Highest Rated</option></select>
+          <span className="text-sm text-gray-500">{filtered.length} services found</span>
         </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-purple-50 to-blue-50 py-12">
-        <div className="container mx-auto px-4">
-          <div className="mb-6">
-            <Link
-              href="/"
-              className="inline-flex items-center text-sm text-gray-600 hover:text-primary"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
-            </Link>
-          </div>
-          <h1 className="text-4xl font-bold mb-4">All Services</h1>
-          <p className="text-gray-600 mb-6">
-            Browse our complete range of professional home services
-          </p>
-
-          {/* Search Bar */}
-          <div className="max-w-2xl">
-            <div className="flex gap-2 bg-white p-2 rounded-lg shadow-md">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                <Input
-                  placeholder="Search services..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 border-0"
-                />
-              </div>
-              <Button>
-                <Search className="h-4 w-4 mr-2" />
-                Search
-              </Button>
+        <div className="grid md:grid-cols-3 gap-6">{filtered.map(service => (
+          <Link key={service._id} href={`/services/${service._id}`} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+            <img src={service.image} alt={service.name} className="w-full h-48 object-cover" />
+            <div className="p-4">
+              <span className="text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">{service.category}</span>
+              <h3 className="font-semibold mt-2 mb-1">{service.name}</h3>
+              <div className="flex items-center gap-2 mb-2"><Star className="h-4 w-4 fill-yellow-400 text-yellow-400" /><span className="text-sm font-medium">{service.rating}</span><span className="text-xs text-gray-500">({service.reviewCount} reviews)</span></div>
+              <div className="flex items-center justify-between"><span className="text-lg font-bold text-purple-600">&#8377;{service.price}</span><span className="text-xs text-gray-500 flex items-center gap-1"><Clock className="h-3 w-3" />{service.duration}</span></div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Filters and Services */}
-      <section className="py-8">
-        <div className="container mx-auto px-4">
-          {/* Filters */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <Button variant="outline" size="sm">
-                <Filter className="h-4 w-4 mr-2" />
-                Filters
-              </Button>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="h-9 px-3 rounded-md border border-input bg-background text-sm"
-              >
-                <option value="popular">Most Popular</option>
-                <option value="rating">Highest Rated</option>
-                <option value="price_asc">Price: Low to High</option>
-                <option value="price_desc">Price: High to Low</option>
-              </select>
-            </div>
-            <p className="text-sm text-gray-600">
-              {filteredServices.length} services found
-            </p>
-          </div>
-
-          {/* Services Grid */}
-          {loading ? (
-            <div className="grid md:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div
-                  key={i}
-                  className="bg-white rounded-xl overflow-hidden shadow-md animate-pulse"
-                >
-                  <div className="aspect-video bg-gray-200"></div>
-                  <div className="p-5 space-y-3">
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                    <div className="h-3 bg-gray-200 rounded"></div>
-                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : filteredServices.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="text-6xl mb-4">🔍</div>
-              <h3 className="text-xl font-semibold mb-2">No services found</h3>
-              <p className="text-gray-600">
-                Try adjusting your search or filters
-              </p>
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-3 gap-6">
-              {filteredServices.map((service) => (
-                <Link
-                  key={service._id}
-                  href={`/services/${service._id}`}
-                  className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow group"
-                >
-                  <div className="aspect-video bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center">
-                    {service.thumbnail ? (
-                      <img
-                        src={service.thumbnail}
-                        alt={service.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                      />
-                    ) : (
-                      <div className="text-6xl">🛠️</div>
-                    )}
-                  </div>
-                  <div className="p-5">
-                    <h3 className="font-semibold text-lg mb-2 group-hover:text-primary">
-                      {service.name}
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                      {service.description}
-                    </p>
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="flex items-center gap-1 text-amber-500">
-                        <Star className="h-4 w-4 fill-current" />
-                        <span className="font-medium">
-                          {service.rating.toFixed(1)}
-                        </span>
-                      </div>
-                      <span className="text-sm text-gray-500">
-                        ({service.totalBookings} bookings)
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        {service.discountPercentage > 0 ? (
-                          <>
-                            <span className="text-2xl font-bold">
-                              ₹{calculateFinalPrice(service)}
-                            </span>
-                            <span className="text-sm text-gray-400 line-through ml-2">
-                              ₹{service.basePrice}
-                            </span>
-                          </>
-                        ) : (
-                          <span className="text-2xl font-bold">
-                            ₹{service.basePrice}
-                          </span>
-                        )}
-                        <p className="text-xs text-gray-500">
-                          {service.durationMinutes} mins
-                        </p>
-                      </div>
-                      <Button size="sm">Book Now</Button>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+          </Link>
+        ))}</div>
+      </div>
+      <footer className="bg-gray-900 text-gray-400 py-8 mt-8"><div className="container mx-auto px-4 text-center"><p>&copy; {new Date().getFullYear()} ServiceHub. All rights reserved.</p></div></footer>
     </div>
   );
 }
