@@ -64,7 +64,7 @@ interface AddressFormData {
 }
 
 const initialFormData: AddressFormData = {
-  label: "Home",
+  label: "home",
   fullAddress: "",
   landmark: "",
   city: "",
@@ -142,6 +142,7 @@ export default function AddressesPage() {
     if (!formData.state.trim()) errors.state = "State is required";
     if (!formData.pincode.trim()) errors.pincode = "Pincode is required";
     else if (!/^\d{6}$/.test(formData.pincode)) errors.pincode = "Pincode must be 6 digits";
+    else if (formData.pincode === "000000") errors.pincode = "Invalid pincode";
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -491,7 +492,7 @@ export default function AddressesPage() {
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <Badge variant={address.isDefault ? "default" : "secondary"}>
-                            {address.label}
+                            {address.label.charAt(0).toUpperCase() + address.label.slice(1)}
                           </Badge>
                           {address.isDefault && (
                             <Badge variant="success">
@@ -572,9 +573,9 @@ export default function AddressesPage() {
                   <SelectValue placeholder="Select label" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Home">Home</SelectItem>
-                  <SelectItem value="Work">Work</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
+                  <SelectItem value="home">Home</SelectItem>
+                  <SelectItem value="work">Work</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
               {formErrors.label && (
@@ -740,9 +741,9 @@ export default function AddressesPage() {
                   <SelectValue placeholder="Select label" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Home">Home</SelectItem>
-                  <SelectItem value="Work">Work</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
+                  <SelectItem value="home">Home</SelectItem>
+                  <SelectItem value="work">Work</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
               {formErrors.label && (
@@ -900,7 +901,9 @@ export default function AddressesPage() {
             <div className="py-4">
               <div className="border rounded-lg p-4 bg-gray-50">
                 <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="secondary">{deletingAddress.label}</Badge>
+                  <Badge variant="secondary">
+                    {deletingAddress.label.charAt(0).toUpperCase() + deletingAddress.label.slice(1)}
+                  </Badge>
                   {deletingAddress.isDefault && (
                     <Badge variant="success">Default</Badge>
                   )}
