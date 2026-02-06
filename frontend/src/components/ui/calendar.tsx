@@ -8,10 +8,11 @@ export interface CalendarProps {
   selected?: Date
   onSelect?: (date: Date) => void
   className?: string
+  disablePastDates?: boolean
 }
 
 const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
-  ({ className, selected, onSelect }, ref) => {
+  ({ className, selected, onSelect, disablePastDates = false }, ref) => {
     const [viewDate, setViewDate] = React.useState(
       selected || new Date()
     )
@@ -80,6 +81,14 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
       )
     }
 
+    const isPastDate = (day: number) => {
+      if (!disablePastDates) return false
+      const date = new Date(viewDate.getFullYear(), viewDate.getMonth(), day)
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      return date < today
+    }
+
     const renderDays = () => {
       const days = []
       const totalDays = daysInMonth(viewDate)
@@ -95,15 +104,18 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
       }
 
       for (let day = 1; day <= totalDays; day++) {
+        const disabled = isPastDate(day)
         days.push(
           <button
             key={day}
-            onClick={() => selectDate(day)}
+            onClick={() => !disabled && selectDate(day)}
+            disabled={disabled}
             className={cn(
               "p-2 text-center text-sm rounded-md hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring",
               isSelectedDate(day) &&
                 "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
-              isToday(day) && !isSelectedDate(day) && "border border-primary"
+              isToday(day) && !isSelectedDate(day) && "border border-primary",
+              disabled && "opacity-50 cursor-not-allowed hover:bg-transparent"
             )}
           >
             {day}
