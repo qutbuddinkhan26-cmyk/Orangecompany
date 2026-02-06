@@ -6,12 +6,13 @@ import {
   cancelBooking,
 } from '../controllers/bookingController';
 import { authenticateToken } from '../middleware/auth';
+import { apiLimiter, createLimiter } from '../middleware/rateLimiter';
 
 const router = express.Router();
 
-router.post('/', authenticateToken, createBooking);
-router.get('/', authenticateToken, getUserBookings);
-router.get('/:id', authenticateToken, getBookingById);
-router.patch('/:id/cancel', authenticateToken, cancelBooking);
+router.post('/', authenticateToken, createLimiter, createBooking);
+router.get('/', authenticateToken, apiLimiter, getUserBookings);
+router.get('/:id', authenticateToken, apiLimiter, getBookingById);
+router.patch('/:id/cancel', authenticateToken, apiLimiter, cancelBooking);
 
 export default router;

@@ -5,11 +5,12 @@ import {
   createService,
 } from '../controllers/serviceController';
 import { authenticateToken, authorizeRole } from '../middleware/auth';
+import { apiLimiter, createLimiter } from '../middleware/rateLimiter';
 
 const router = express.Router();
 
-router.get('/', getAllServices);
-router.get('/:id', getServiceById);
-router.post('/', authenticateToken, authorizeRole('admin'), createService);
+router.get('/', apiLimiter, getAllServices);
+router.get('/:id', apiLimiter, getServiceById);
+router.post('/', authenticateToken, authorizeRole('admin'), createLimiter, createService);
 
 export default router;
