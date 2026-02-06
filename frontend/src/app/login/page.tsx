@@ -35,6 +35,8 @@ export default function LoginPage() {
 
       if (response.ok) {
         // Store token in localStorage
+        // Note: In production, consider using httpOnly cookies for enhanced security
+        // against XSS attacks. This implementation uses localStorage for simplicity.
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
         

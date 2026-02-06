@@ -9,6 +9,13 @@ import bookingRoutes from './routes/bookingRoutes';
 // Load environment variables
 dotenv.config();
 
+// Validate required environment variables
+if (!process.env.JWT_SECRET) {
+  console.error('❌ FATAL ERROR: JWT_SECRET is not defined in environment variables.');
+  console.error('Please set JWT_SECRET in your .env file before starting the server.');
+  process.exit(1);
+}
+
 // Initialize express app
 const app: Application = express();
 

@@ -3,6 +3,14 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
 
+const getJWTSecret = (): string => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET is not defined in environment variables');
+  }
+  return secret;
+};
+
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password, fullName, phone, role } = req.body;
@@ -35,9 +43,10 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     await user.save();
 
     // Generate JWT token
+    const secret = getJWTSecret();
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role },
-      process.env.JWT_SECRET || 'your-secret-key',
+      secret,
       { expiresIn: '7d' }
     );
 
@@ -88,9 +97,10 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Generate JWT token
+    const secret = getJWTSecret();
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role },
-      process.env.JWT_SECRET || 'your-secret-key',
+      secret,
       { expiresIn: '7d' }
     );
 

@@ -9,6 +9,14 @@ export interface AuthRequest extends Request {
   };
 }
 
+const getJWTSecret = (): string => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET is not defined in environment variables');
+  }
+  return secret;
+};
+
 export const authenticateToken = (
   req: AuthRequest,
   res: Response,
@@ -23,7 +31,7 @@ export const authenticateToken = (
       return;
     }
 
-    const secret = process.env.JWT_SECRET || 'your-secret-key';
+    const secret = getJWTSecret();
     
     jwt.verify(token, secret, (err: any, decoded: any) => {
       if (err) {
