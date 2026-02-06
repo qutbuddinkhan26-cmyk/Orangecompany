@@ -84,7 +84,7 @@ export default function ReviewForm({
         ? `${API_URL}/reviews/${initialData?._id || ""}`
         : `${API_URL}/reviews`;
 
-      const method = isEdit ? "PUT" : "POST";
+      const method = isEdit ? "PATCH" : "POST";
 
       const body: any = {
         rating,

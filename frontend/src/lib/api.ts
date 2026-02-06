@@ -127,7 +127,7 @@ export const api = {
     images?: string[];
   }) {
     const response = await fetch(`${API_URL}/reviews/${reviewId}`, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: getAuthHeaders(),
       body: JSON.stringify(reviewData),
     });
