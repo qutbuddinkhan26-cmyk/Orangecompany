@@ -7,6 +7,7 @@ import serviceRoutes from './routes/serviceRoutes';
 import bookingRoutes from './routes/bookingRoutes';
 import addressRoutes from './routes/addressRoutes';
 import reviewRoutes from './routes/reviewRoutes';
+import providerRoutes from './routes/providerRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -37,6 +38,7 @@ app.use('/api/services', serviceRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/addresses', addressRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/provider', providerRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
