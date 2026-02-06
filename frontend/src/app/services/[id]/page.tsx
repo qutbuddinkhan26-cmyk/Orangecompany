@@ -42,6 +42,7 @@ import {
   generateTimeSlots,
   ApiError,
 } from "@/lib/api";
+import ReviewCard from "@/components/ReviewCard";
 
 interface Service {
   _id: string;
@@ -373,13 +374,7 @@ export default function ServiceDetailPage() {
             {/* Reviews Section */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
-              <div className="text-center py-8 text-gray-500">
-                <Star className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                <p>Review system coming soon</p>
-                <p className="text-sm mt-2">
-                  Be the first to leave a review after booking this service
-                </p>
-              </div>
+              <ReviewsSection serviceId={serviceId} />
             </div>
           </div>
 
@@ -648,6 +643,118 @@ export default function ServiceDetailPage() {
           </form>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+// Reviews Section Component
+function ReviewsSection({ serviceId }: { serviceId: string }) {
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [averageRating, setAverageRating] = useState(0);
+  const [totalReviews, setTotalReviews] = useState(0);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+
+  useEffect(() => {
+    loadReviews();
+  }, [serviceId, page]);
+
+  const loadReviews = async () => {
+    try {
+      setLoading(true);
+      const data = await api.getServiceReviews(serviceId, page, 5);
+      
+      if (page === 1) {
+        setReviews(data.reviews);
+      } else {
+        setReviews([...reviews, ...data.reviews]);
+      }
+      
+      setAverageRating(data.averageRating);
+      setTotalReviews(data.totalReviews);
+      setHasMore(page < data.totalPages);
+      setError("");
+    } catch (err: any) {
+      setError(err.message || "Failed to load reviews");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading && page === 1) {
+    return (
+      <div className="text-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+        <p className="mt-3 text-gray-600">Loading reviews...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8 text-red-600">
+        <p>{error}</p>
+      </div>
+    );
+  }
+
+  if (totalReviews === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        <Star className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+        <p>No reviews yet</p>
+        <p className="text-sm mt-2">
+          Be the first to leave a review after booking this service
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {/* Rating Summary */}
+      <div className="flex items-center gap-4 mb-6 pb-6 border-b">
+        <div className="text-center">
+          <div className="text-4xl font-bold text-primary">{averageRating.toFixed(1)}</div>
+          <div className="flex items-center justify-center gap-1 mt-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <Star
+                key={star}
+                className={`h-4 w-4 ${
+                  star <= Math.round(averageRating)
+                    ? "fill-amber-500 text-amber-500"
+                    : "fill-gray-200 text-gray-200"
+                }`}
+              />
+            ))}
+          </div>
+          <p className="text-sm text-gray-600 mt-1">
+            {totalReviews} {totalReviews === 1 ? "review" : "reviews"}
+          </p>
+        </div>
+      </div>
+
+      {/* Reviews List */}
+      <div className="space-y-4">
+        {reviews.map((review) => (
+          <ReviewCard key={review._id} review={review} />
+        ))}
+      </div>
+
+      {/* Load More */}
+      {hasMore && (
+        <div className="text-center mt-6">
+          <Button
+            variant="outline"
+            onClick={() => setPage(page + 1)}
+            disabled={loading}
+          >
+            {loading ? "Loading..." : "Load More Reviews"}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

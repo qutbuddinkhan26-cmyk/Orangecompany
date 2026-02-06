@@ -91,6 +91,65 @@ export const api = {
     });
     return handleResponse(response);
   },
+
+  // Reviews
+  async getServiceReviews(serviceId: string, page = 1, limit = 10) {
+    const response = await fetch(`${API_URL}/reviews/service/${serviceId}?page=${page}&limit=${limit}`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async getUserReviews(userId: string) {
+    const response = await fetch(`${API_URL}/reviews/user/${userId}`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async createReview(reviewData: {
+    bookingId: string;
+    rating: number;
+    review: string;
+    images?: string[];
+  }) {
+    const response = await fetch(`${API_URL}/reviews`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(reviewData),
+    });
+    return handleResponse(response);
+  },
+
+  async updateReview(reviewId: string, reviewData: {
+    rating?: number;
+    review?: string;
+    images?: string[];
+  }) {
+    const response = await fetch(`${API_URL}/reviews/${reviewId}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(reviewData),
+    });
+    return handleResponse(response);
+  },
+
+  async deleteReview(reviewId: string) {
+    const response = await fetch(`${API_URL}/reviews/${reviewId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async addProviderResponse(reviewId: string, response: string) {
+    const res = await fetch(`${API_URL}/reviews/${reviewId}/response`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ response }),
+    });
+    return handleResponse(res);
+  },
 };
 
 export function isAuthenticated(): boolean {
