@@ -150,6 +150,49 @@ export const api = {
     });
     return handleResponse(res);
   },
+
+  // Auth/Profile
+  async getProfile() {
+    const response = await fetch(`${API_URL}/auth/profile`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async updateProfile(profileData: {
+    fullName?: string;
+    phone?: string;
+    dateOfBirth?: string;
+    profilePhoto?: string;
+  }) {
+    const response = await fetch(`${API_URL}/auth/profile`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(profileData),
+    });
+    return handleResponse(response);
+  },
+
+  async changePassword(passwordData: {
+    currentPassword: string;
+    newPassword: string;
+  }) {
+    const response = await fetch(`${API_URL}/auth/change-password`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(passwordData),
+    });
+    return handleResponse(response);
+  },
+
+  async deleteAccount(password: string) {
+    const response = await fetch(`${API_URL}/auth/account`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ password }),
+    });
+    return handleResponse(response);
+  },
 };
 
 export function isAuthenticated(): boolean {
