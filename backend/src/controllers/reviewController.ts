@@ -72,10 +72,16 @@ export const createReview = async (req: AuthRequest, res: Response): Promise<voi
 
 export const getServiceReviews = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { serviceId } = req.params;
+    const serviceId = req.params.serviceId as string;
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
     const skip = (page - 1) * limit;
+
+    // Validate serviceId
+    if (!mongoose.Types.ObjectId.isValid(serviceId)) {
+      res.status(400).json({ message: 'Invalid service ID' });
+      return;
+    }
 
     const totalReviews = await Review.countDocuments({ serviceId });
     const reviews = await Review.find({ serviceId })
@@ -86,7 +92,7 @@ export const getServiceReviews = async (req: Request, res: Response): Promise<vo
 
     // Calculate average rating
     const ratingStats = await Review.aggregate([
-      { $match: { serviceId: new mongoose.Types.ObjectId(serviceId as string) } },
+      { $match: { serviceId: new mongoose.Types.ObjectId(serviceId) } },
       {
         $group: {
           _id: null,
