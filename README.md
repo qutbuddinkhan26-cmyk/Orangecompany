@@ -3,7 +3,7 @@
 A comprehensive, production-ready service booking web application similar to Urban Company that connects customers with service providers across various categories like home cleaning, beauty services, repairs, and more.
 
 ![License](https://img.shields.io/badge/license-ISC-blue.svg)
-![Next.js](https://img.shields.io/badge/Next.js-14+-black)
+![Next.js](https://img.shields.io/badge/Next.js-16+-black)
 ![Node.js](https://img.shields.io/badge/Node.js-18+-green)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue)
 
@@ -36,7 +36,7 @@ A comprehensive, production-ready service booking web application similar to Urb
 ## 🚀 Tech Stack
 
 ### Frontend
-- **Framework**: Next.js 14+ with App Router
+- **Framework**: Next.js 16+ with App Router
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **UI Components**: shadcn/ui, Radix UI
