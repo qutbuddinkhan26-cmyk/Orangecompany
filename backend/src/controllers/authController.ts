@@ -137,3 +137,119 @@ export const getProfile = async (req: any, res: Response): Promise<void> => {
     res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 };
+
+export const updateProfile = async (req: any, res: Response): Promise<void> => {
+  try {
+    const userId = req.user.userId;
+    const { fullName, phone, dateOfBirth, profilePhoto } = req.body;
+
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    // Update fields
+    if (fullName) user.fullName = fullName;
+    if (phone !== undefined) user.phone = phone;
+    if (dateOfBirth !== undefined) user.dateOfBirth = dateOfBirth;
+    if (profilePhoto !== undefined) user.profilePhoto = profilePhoto;
+
+    await user.save();
+
+    res.status(200).json({
+      message: 'Profile updated successfully',
+      user: {
+        id: user._id,
+        email: user.email,
+        fullName: user.fullName,
+        phone: user.phone,
+        dateOfBirth: user.dateOfBirth,
+        profilePhoto: user.profilePhoto,
+        role: user.role,
+      },
+    });
+  } catch (error: any) {
+    console.error('Update profile error:', error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};
+
+export const changePassword = async (req: any, res: Response): Promise<void> => {
+  try {
+    const userId = req.user.userId;
+    const { currentPassword, newPassword } = req.body;
+
+    // Validate input
+    if (!currentPassword || !newPassword) {
+      res.status(400).json({ message: 'Current password and new password are required' });
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      res.status(400).json({ message: 'New password must be at least 6 characters long' });
+      return;
+    }
+
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    // Verify current password
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isPasswordValid) {
+      res.status(401).json({ message: 'Current password is incorrect' });
+      return;
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: 'Password changed successfully' });
+  } catch (error: any) {
+    console.error('Change password error:', error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};
+
+export const deleteAccount = async (req: any, res: Response): Promise<void> => {
+  try {
+    const userId = req.user.userId;
+    const { password } = req.body;
+
+    // Validate input
+    if (!password) {
+      res.status(400).json({ message: 'Password is required to delete account' });
+      return;
+    }
+
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    // Verify password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      res.status(401).json({ message: 'Password is incorrect' });
+      return;
+    }
+
+    // Soft delete - deactivate account instead of deleting
+    user.isActive = false;
+    await user.save();
+
+    res.status(200).json({ message: 'Account deleted successfully' });
+  } catch (error: any) {
+    console.error('Delete account error:', error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};

@@ -13,6 +13,9 @@ export interface IBooking extends Document {
   totalAmount: number;
   discountAmount: number;
   finalAmount: number;
+  couponId?: mongoose.Types.ObjectId;
+  couponCode?: string;
+  couponDiscount?: number;
   specialInstructions?: string;
   cancellationReason?: string;
   completedAt?: Date;
@@ -78,6 +81,19 @@ const bookingSchema = new Schema<IBooking>(
     finalAmount: {
       type: Number,
       required: true,
+      min: 0,
+    },
+    couponId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Coupon',
+    },
+    couponCode: {
+      type: String,
+      uppercase: true,
+    },
+    couponDiscount: {
+      type: Number,
+      default: 0,
       min: 0,
     },
     specialInstructions: {

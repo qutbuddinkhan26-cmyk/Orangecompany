@@ -12,6 +12,8 @@ export const createBooking = async (req: AuthRequest, res: Response): Promise<vo
       timeSlot,
       addressId,
       specialInstructions,
+      couponId,
+      discountAmount: couponDiscountAmount,
     } = req.body;
 
     // Validate input
@@ -28,9 +30,29 @@ export const createBooking = async (req: AuthRequest, res: Response): Promise<vo
     }
 
     // Calculate amounts
-    const totalAmount = service.basePrice;
-    const discountAmount = (totalAmount * service.discountPercentage) / 100;
-    const finalAmount = totalAmount - discountAmount;
+    const basePrice = service.basePrice;
+    const serviceDiscountAmount = (basePrice * service.discountPercentage) / 100;
+    const totalAmount = basePrice - serviceDiscountAmount;
+    
+    let couponDiscount = 0;
+    let couponCode = '';
+    
+    // If coupon is provided, apply it
+    if (couponId && couponDiscountAmount) {
+      const Coupon = (await import('../models/Coupon')).default;
+      const coupon = await Coupon.findById(couponId);
+      
+      if (coupon) {
+        couponDiscount = couponDiscountAmount;
+        couponCode = coupon.code;
+        
+        // Increment coupon usage
+        coupon.usageCount += 1;
+        await coupon.save();
+      }
+    }
+
+    const finalAmount = totalAmount - couponDiscount;
 
     // Generate booking number
     const bookingNumber = `BK${Date.now()}${Math.floor(Math.random() * 1000)}`;
@@ -44,8 +66,11 @@ export const createBooking = async (req: AuthRequest, res: Response): Promise<vo
       timeSlot,
       addressId,
       totalAmount,
-      discountAmount,
+      discountAmount: serviceDiscountAmount,
       finalAmount,
+      couponId: couponId || undefined,
+      couponCode: couponCode || undefined,
+      couponDiscount,
       specialInstructions,
       status: 'pending',
       paymentStatus: 'pending',

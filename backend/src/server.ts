@@ -5,6 +5,11 @@ import { connectDatabase } from './config/database';
 import authRoutes from './routes/authRoutes';
 import serviceRoutes from './routes/serviceRoutes';
 import bookingRoutes from './routes/bookingRoutes';
+import addressRoutes from './routes/addressRoutes';
+import reviewRoutes from './routes/reviewRoutes';
+import providerRoutes from './routes/providerRoutes';
+import adminRoutes from './routes/adminRoutes';
+import couponRoutes from './routes/couponRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -33,6 +38,11 @@ app.get('/health', (req: Request, res: Response) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/addresses', addressRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/provider', providerRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/coupons', couponRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
