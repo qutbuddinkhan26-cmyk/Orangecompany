@@ -12,9 +12,6 @@ export interface CalendarProps {
 
 const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
   ({ className, selected, onSelect }, ref) => {
-    const [currentDate, setCurrentDate] = React.useState(
-      selected || new Date()
-    )
     const [viewDate, setViewDate] = React.useState(
       selected || new Date()
     )
@@ -62,7 +59,6 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
         viewDate.getMonth(),
         day
       )
-      setCurrentDate(newDate)
       onSelect?.(newDate)
     }
 
