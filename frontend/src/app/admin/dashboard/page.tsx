@@ -1,21 +1,182 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Users, ShoppingBag, Calendar, DollarSign, TrendingUp, AlertCircle } from "lucide-react";
+"use client";
 
-export default function AdminDashboard() {
-  const stats = [{label: "Total Users", value: "12,456", change: "+12%", icon: Users, color: "bg-blue-50 text-blue-600"}, {label: "Total Services", value: "148", change: "+5%", icon: ShoppingBag, color: "bg-green-50 text-green-600"}, {label: "Total Bookings", value: "8,923", change: "+18%", icon: Calendar, color: "bg-purple-50 text-purple-600"}, {label: "Revenue", value: "$89,450", change: "+22%", icon: DollarSign, color: "bg-yellow-50 text-yellow-600"}];
-  const recentUsers = [{name: "Ahmed Khan", email: "ahmed@email.com", role: "customer", joined: "Feb 7"}, {name: "Lisa Wong", email: "lisa@email.com", role: "provider", joined: "Feb 6"}, {name: "Raj Patel", email: "raj@email.com", role: "customer", joined: "Feb 6"}, {name: "Maria Garcia", email: "maria@email.com", role: "provider", joined: "Feb 5"}];
-  const recentBookings = [{id: "#SH2001", customer: "John D.", service: "Deep Cleaning", amount: 999, status: "completed"}, {id: "#SH2002", customer: "Sarah A.", service: "AC Repair", amount: 499, status: "in-progress"}, {id: "#SH2003", customer: "Mike C.", service: "Plumbing", amount: 349, status: "pending"}, {id: "#SH2004", customer: "Priya P.", service: "Electrical", amount: 399, status: "completed"}];
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+
+export default function AdminDashboardPage() {
+  const router = useRouter();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.replace("/login");
+      return;
+    }
+
+    if (!authLoading && isAuthenticated && user?.role !== "admin") {
+      router.replace("/dashboard");
+    }
+  }, [authLoading, isAuthenticated, router, user?.role]);
+
+  const stats = [
+    { label: "Total users", value: "12,480" },
+    { label: "Services", value: "1,120" },
+    { label: "Bookings", value: "9,842" },
+    { label: "Revenue (AED)", value: "1.8M" },
+  ];
+
+  const recentUsers = [
+    { name: "Ahmed Khalid", email: "ahmed@servicehub.ae", role: "customer" },
+    { name: "Noura Saeed", email: "noura@servicehub.ae", role: "provider" },
+    { name: "Jonas Lee", email: "jonas@servicehub.ae", role: "customer" },
+  ];
+
+  const recentBookings = [
+    { id: "SH-2041", service: "Deep Home Cleaning", customer: "Aisha M.", amount: 320, status: "completed" },
+    { id: "SH-2040", service: "AC Cooling Tune-Up", customer: "Daniel R.", amount: 350, status: "pending" },
+    { id: "SH-2039", service: "Electrical Safety Upgrade", customer: "Fatima H.", amount: 320, status: "accepted" },
+  ];
+
+  const statusStyles: Record<string, string> = {
+    pending: "bg-yellow-100 text-yellow-700",
+    accepted: "bg-green-100 text-green-700",
+    completed: "bg-blue-100 text-blue-700",
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b bg-white"><div className="container mx-auto px-4 py-4 flex items-center justify-between"><Link href="/" className="text-2xl font-bold text-purple-600">ServiceHub <span className="text-sm bg-red-100 text-red-600 px-2 py-0.5 rounded ml-2">Admin</span></Link><Link href="/"><Button variant="outline" size="sm">Logout</Button></Link></div></header>
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">{stats.map((s, i) => <div key={i} className="bg-white rounded-xl p-5 shadow-sm"><div className="flex items-center justify-between mb-3"><div className={`w-10 h-10 rounded-lg ${s.color} flex items-center justify-center`}><s.icon className="h-5 w-5" /></div><span className="text-xs text-green-600 flex items-center gap-1"><TrendingUp className="h-3 w-3" />{s.change}</span></div><p className="text-2xl font-bold">{s.value}</p><p className="text-sm text-gray-500">{s.label}</p></div>)}</div>
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-xl shadow-sm"><div className="p-5 border-b flex justify-between items-center"><h2 className="font-semibold">Recent Users</h2><Button variant="outline" size="sm">View All</Button></div><div className="divide-y">{recentUsers.map((u, i) => <div key={i} className="p-4 flex items-center justify-between"><div><p className="font-medium">{u.name}</p><p className="text-sm text-gray-500">{u.email}</p></div><div className="text-right"><span className={`text-xs px-2 py-1 rounded-full ${u.role === "provider" ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-700"}`}>{u.role}</span><p className="text-xs text-gray-400 mt-1">{u.joined}</p></div></div>)}</div></div>
-          <div className="bg-white rounded-xl shadow-sm"><div className="p-5 border-b flex justify-between items-center"><h2 className="font-semibold">Recent Bookings</h2><Button variant="outline" size="sm">View All</Button></div><div className="divide-y">{recentBookings.map(b => <div key={b.id} className="p-4 flex items-center justify-between"><div><p className="font-medium">{b.customer}</p><p className="text-sm text-gray-500">{b.service} - {b.id}</p></div><div className="text-right"><span className={`text-xs px-2 py-1 rounded-full ${b.status === "completed" ? "bg-green-100 text-green-700" : b.status === "in-progress" ? "bg-blue-100 text-blue-700" : "bg-yellow-100 text-yellow-700"}`}>{b.status}</span><p className="text-sm font-semibold mt-1">&#8377;{b.amount}</p></div></div>)}</div></div>
+    <div className="min-h-screen bg-slate-50">
+      <div className="mx-auto w-full max-w-6xl px-4 py-12 md:px-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-600">
+              Admin dashboard
+            </p>
+            <h1 className="mt-2 text-3xl font-semibold text-slate-900">
+              ServiceHub overview
+            </h1>
+            <p className="mt-2 text-sm text-slate-500">
+              Track platform health and manage operations across Dubai.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href="/services"
+              className="rounded-xl border border-orange-200 px-4 py-2 text-sm font-semibold text-orange-600"
+            >
+              View services
+            </Link>
+            <button
+              type="button"
+              className="rounded-xl bg-orange-600 px-4 py-2 text-sm font-semibold text-white"
+            >
+              Create report
+            </button>
+          </div>
         </div>
+
+        <div className="mt-8 grid gap-4 md:grid-cols-4">
+          {stats.map((stat) => (
+            <div
+              key={stat.label}
+              className="rounded-2xl border border-orange-100 bg-white p-5"
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                {stat.label}
+              </p>
+              <p className="mt-3 text-3xl font-semibold text-slate-900">
+                {stat.value}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-10 grid gap-6 lg:grid-cols-[1fr_1.2fr]">
+          <section className="rounded-2xl border border-slate-200 bg-white p-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-slate-900">Recent users</h2>
+              <span className="text-sm text-slate-500">Last 24h</span>
+            </div>
+            <div className="mt-6 space-y-4">
+              {recentUsers.map((userItem) => (
+                <div
+                  key={userItem.email}
+                  className="flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3"
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">
+                      {userItem.name}
+                    </p>
+                    <p className="text-xs text-slate-500">{userItem.email}</p>
+                  </div>
+                  <span className="rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-600">
+                    {userItem.role}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-slate-200 bg-white p-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-slate-900">Recent bookings</h2>
+              <span className="text-sm text-slate-500">Last 12h</span>
+            </div>
+            <div className="mt-6 space-y-4">
+              {recentBookings.map((booking) => (
+                <div
+                  key={booking.id}
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 px-4 py-3"
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">
+                      {booking.service}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {booking.customer} • {booking.id}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-orange-600">
+                      AED {booking.amount}
+                    </span>
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                        statusStyles[booking.status]
+                      }`}
+                    >
+                      {booking.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+
+        <section className="mt-10 rounded-2xl border border-slate-200 bg-white p-6">
+          <h2 className="text-xl font-semibold text-slate-900">Quick actions</h2>
+          <div className="mt-4 grid gap-4 md:grid-cols-3">
+            {[
+              { label: "Approve providers", description: "Review new provider signups" },
+              { label: "Monitor cancellations", description: "Track cancellation reasons" },
+              { label: "Send platform update", description: "Notify users of changes" },
+            ].map((action) => (
+              <div
+                key={action.label}
+                className="rounded-2xl border border-orange-100 bg-orange-50 p-4"
+              >
+                <p className="text-sm font-semibold text-slate-900">
+                  {action.label}
+                </p>
+                <p className="mt-1 text-xs text-slate-500">
+                  {action.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );

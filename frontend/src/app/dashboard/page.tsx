@@ -1,274 +1,189 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import {
-  User,
-  Calendar,
-  MapPin,
-  CreditCard,
-  Bell,
-  LogOut,
-  Settings,
-} from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { fetchApi } from "@/lib/api";
+
+type Booking = {
+  _id: string;
+  status?: string;
+  date?: string;
+  time?: string;
+  address?: string;
+  service?: {
+    name?: string;
+  };
+};
+
+const statusStyles: Record<string, string> = {
+  pending: "bg-yellow-100 text-yellow-700",
+  accepted: "bg-green-100 text-green-700",
+  rejected: "bg-red-100 text-red-700",
+  completed: "bg-blue-100 text-blue-700",
+};
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<any>(null);
-  const [bookings, setBookings] = useState<any[]>([]);
+  const router = useRouter();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if user is logged in
-    const userData = localStorage.getItem("user");
-    if (!userData) {
-      window.location.href = "/login";
-      return;
+    if (!authLoading && !isAuthenticated) {
+      router.replace("/login");
     }
-    setUser(JSON.parse(userData));
+  }, [authLoading, isAuthenticated, router]);
 
-    // Fetch bookings
-    fetchBookings();
-  }, []);
-
-  const fetchBookings = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/bookings`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+  useEffect(() => {
+    let isMounted = true;
+    const loadBookings = async () => {
+      try {
+        const data = (await fetchApi("/bookings", { method: "GET" })) as Booking[];
+        if (isMounted) {
+          setBookings(data);
         }
-      );
-      const data = await response.json();
-      if (data.success) {
-        setBookings(data.bookings);
+      } catch (err) {
+        const message =
+          typeof err === "object" && err && "message" in err
+            ? String((err as { message?: string }).message)
+            : "Failed to load bookings.";
+        if (isMounted) {
+          setError(message);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-    } catch (error) {
-      console.error("Error fetching bookings:", error);
-    } finally {
-      setLoading(false);
+    };
+
+    if (isAuthenticated) {
+      loadBookings();
     }
-  };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "/";
-  };
+    return () => {
+      isMounted = false;
+    };
+  }, [isAuthenticated]);
 
-  if (!user) {
-    return null;
-  }
+  const stats = useMemo(() => {
+    const total = bookings.length;
+    const active = bookings.filter((booking) =>
+      ["pending", "accepted"].includes(booking.status || "")
+    ).length;
+    const completed = bookings.filter((booking) => booking.status === "completed")
+      .length;
+    return { total, active, completed };
+  }, [bookings]);
+
+  const welcomeName = user?.name || user?.fullName || "there";
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="text-2xl font-bold text-primary">
-              ServiceHub
-            </Link>
-            <nav className="hidden md:flex items-center gap-6">
-              <Link href="/services" className="text-sm hover:text-primary">
-                Browse Services
-              </Link>
-              <Link href="/dashboard" className="text-sm text-primary font-medium">
-                Dashboard
-              </Link>
-            </nav>
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
-            </Button>
+    <div className="min-h-screen bg-slate-50">
+      <div className="mx-auto w-full max-w-6xl px-4 py-12 md:px-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-600">
+              Dashboard
+            </p>
+            <h1 className="mt-2 text-3xl font-semibold text-slate-900">
+              Welcome back, {welcomeName}
+            </h1>
+            <p className="mt-2 text-sm text-slate-500">
+              Track your bookings and keep tabs on upcoming services.
+            </p>
           </div>
+          <Link
+            href="/services"
+            className="inline-flex items-center justify-center rounded-xl bg-orange-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-orange-500"
+          >
+            Book a new service
+          </Link>
         </div>
-      </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex gap-8">
-          {/* Sidebar */}
-          <aside className="w-64 flex-shrink-0">
-            <div className="bg-white rounded-xl shadow-md p-6 mb-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                  <User className="h-8 w-8 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-semibold">{user.fullName}</h3>
-                  <p className="text-sm text-gray-500">{user.email}</p>
-                </div>
-              </div>
-              <div className="border-t pt-4">
-                <div className="text-sm text-gray-500 mb-1">Member since</div>
-                <div className="font-medium">
-                  {new Date().toLocaleDateString()}
-                </div>
-              </div>
+        <div className="mt-8 grid gap-4 md:grid-cols-3">
+          {[
+            { label: "Total bookings", value: stats.total },
+            { label: "Active bookings", value: stats.active },
+            { label: "Completed bookings", value: stats.completed },
+          ].map((card) => (
+            <div
+              key={card.label}
+              className="rounded-2xl border border-orange-100 bg-white p-5"
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                {card.label}
+              </p>
+              <p className="mt-3 text-3xl font-semibold text-slate-900">
+                {card.value}
+              </p>
             </div>
+          ))}
+        </div>
 
-            <nav className="bg-white rounded-xl shadow-md p-4">
-              <Link
-                href="/dashboard"
-                className="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary font-medium mb-2"
-              >
-                <Calendar className="h-5 w-5" />
-                My Bookings
-              </Link>
-              <Link
-                href="/dashboard/profile"
-                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50"
-              >
-                <User className="h-5 w-5" />
-                Profile
-              </Link>
-              <Link
-                href="/dashboard/addresses"
-                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50"
-              >
-                <MapPin className="h-5 w-5" />
-                Addresses
-              </Link>
-              <Link
-                href="/dashboard/payments"
-                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50"
-              >
-                <CreditCard className="h-5 w-5" />
-                Payments
-              </Link>
-              <Link
-                href="/dashboard/notifications"
-                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50"
-              >
-                <Bell className="h-5 w-5" />
-                Notifications
-              </Link>
-              <Link
-                href="/dashboard/settings"
-                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50"
-              >
-                <Settings className="h-5 w-5" />
-                Settings
-              </Link>
-            </nav>
-          </aside>
+        <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-slate-900">Recent bookings</h2>
+            <span className="text-sm text-slate-500">
+              {bookings.length} total
+            </span>
+          </div>
 
-          {/* Main Content */}
-          <main className="flex-1">
-            <div className="mb-6">
-              <h1 className="text-3xl font-bold mb-2">Welcome back, {user.fullName}!</h1>
-              <p className="text-gray-600">Manage your bookings and profile</p>
+          {loading && (
+            <div className="mt-6 space-y-4">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div
+                  key={`skeleton-${index}`}
+                  className="h-16 w-full animate-pulse rounded-xl bg-slate-100"
+                />
+              ))}
             </div>
+          )}
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-3 gap-6 mb-8">
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <div className="text-sm text-gray-500 mb-1">Total Bookings</div>
-                <div className="text-3xl font-bold">{bookings.length}</div>
-              </div>
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <div className="text-sm text-gray-500 mb-1">Upcoming</div>
-                <div className="text-3xl font-bold">
-                  {bookings.filter((b) => b.status === "confirmed" || b.status === "pending").length}
-                </div>
-              </div>
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <div className="text-sm text-gray-500 mb-1">Completed</div>
-                <div className="text-3xl font-bold">
-                  {bookings.filter((b) => b.status === "completed").length}
-                </div>
-              </div>
+          {!loading && error && (
+            <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+              {error}
             </div>
+          )}
 
-            {/* Bookings List */}
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold">My Bookings</h2>
-                <Link href="/services">
-                  <Button size="sm">Book New Service</Button>
-                </Link>
-              </div>
+          {!loading && !error && bookings.length === 0 && (
+            <div className="mt-8 rounded-2xl border border-orange-100 bg-orange-50 px-4 py-6 text-center text-sm text-orange-700">
+              No bookings yet. Start by booking your first service.
+            </div>
+          )}
 
-              {loading ? (
-                <div className="space-y-4">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="border rounded-lg p-4 animate-pulse">
-                      <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
-                      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+          {!loading && !error && bookings.length > 0 && (
+            <div className="mt-6 space-y-4">
+              {bookings.map((booking) => {
+                const status = booking.status || "pending";
+                return (
+                  <div
+                    key={booking._id}
+                    className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200 px-4 py-3"
+                  >
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900">
+                        {booking.service?.name || "Service booking"}
+                      </p>
+                      <p className="mt-1 text-xs text-slate-500">
+                        {booking.date || "Date pending"} {booking.time ? `at ${booking.time}` : ""}
+                      </p>
                     </div>
-                  ))}
-                </div>
-              ) : bookings.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="text-6xl mb-4">📅</div>
-                  <h3 className="text-xl font-semibold mb-2">No bookings yet</h3>
-                  <p className="text-gray-600 mb-4">
-                    Start by booking your first service
-                  </p>
-                  <Link href="/services">
-                    <Button>Browse Services</Button>
-                  </Link>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {bookings.map((booking) => (
-                    <div
-                      key={booking._id}
-                      className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                        statusStyles[status] || "bg-slate-100 text-slate-600"
+                      }`}
                     >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <h3 className="font-semibold">
-                              {booking.serviceId?.name || "Service"}
-                            </h3>
-                            <span
-                              className={`text-xs px-2 py-1 rounded-full ${
-                                booking.status === "completed"
-                                  ? "bg-green-100 text-green-700"
-                                  : booking.status === "confirmed"
-                                  ? "bg-blue-100 text-blue-700"
-                                  : booking.status === "cancelled"
-                                  ? "bg-red-100 text-red-700"
-                                  : "bg-yellow-100 text-yellow-700"
-                              }`}
-                            >
-                              {booking.status}
-                            </span>
-                          </div>
-                          <div className="text-sm text-gray-600 space-y-1">
-                            <p>
-                              📅 {new Date(booking.bookingDate).toLocaleDateString()} at{" "}
-                              {booking.timeSlot}
-                            </p>
-                            <p>
-                              📍 {booking.addressId?.fullAddress || "Address not available"}
-                            </p>
-                            <p className="font-medium mt-2">
-                              Amount: ₹{booking.finalAmount}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                          <Button variant="outline" size="sm">
-                            View Details
-                          </Button>
-                          {booking.status === "pending" && (
-                            <Button variant="destructive" size="sm">
-                              Cancel
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                      {status}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
-          </main>
+          )}
         </div>
       </div>
     </div>

@@ -1,287 +1,217 @@
 import Link from "next/link";
-import { Search, Star, Shield, Clock, CheckCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 export default function HomePage() {
-  const categories = [
-    { name: "Home Cleaning", icon: "🧹", services: "12+ services" },
-    { name: "Beauty & Spa", icon: "💆", services: "25+ services" },
-    { name: "Appliance Repair", icon: "🔧", services: "15+ services" },
-    { name: "Painting", icon: "🎨", services: "8+ services" },
-    { name: "Pest Control", icon: "🐛", services: "6+ services" },
-    { name: "Plumbing", icon: "🚰", services: "10+ services" },
-    { name: "Electrical", icon: "⚡", services: "12+ services" },
-    { name: "Carpentry", icon: "🪚", services: "9+ services" },
+  const features = [
+    {
+      title: "Easy Booking",
+      description: "Book trusted professionals in Dubai within minutes.",
+      icon: "⚡",
+    },
+    {
+      title: "Trusted Providers",
+      description: "Every pro is vetted, trained, and reviewed by customers.",
+      icon: "✅",
+    },
+    {
+      title: "Best Prices",
+      description: "Transparent rates with no hidden charges, always in AED.",
+      icon: "💸",
+    },
   ];
 
-  const featuredServices = [
+  const popularServices = [
     {
-      id: 1,
-      name: "Deep Home Cleaning",
-      price: 999,
+      id: "1",
+      name: "AC Cooling Tune-Up",
+      category: "AC Repair",
+      price: 350,
       rating: 4.8,
-      reviews: 2534,
-      duration: "3-4 hours",
-      image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400",
+      image: "https://images.unsplash.com/photo-1606229365485-93a3b8ee0385?w=800",
     },
     {
-      id: 2,
-      name: "AC Service & Repair",
-      price: 499,
-      rating: 4.7,
-      reviews: 1823,
-      duration: "1-2 hours",
-      image: "https://images.unsplash.com/photo-1631545806609-fa7e4ad5c2e0?w=400",
-    },
-    {
-      id: 3,
-      name: "Salon for Women",
-      price: 799,
+      id: "2",
+      name: "Deep Home Cleaning",
+      category: "Cleaning",
+      price: 220,
       rating: 4.9,
-      reviews: 3421,
-      duration: "2-3 hours",
-      image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400",
+      image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800",
+    },
+    {
+      id: "3",
+      name: "Electrical Safety Upgrade",
+      category: "Electrical",
+      price: 320,
+      rating: 4.7,
+      image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800",
     },
   ];
 
-  const howItWorks = [
+  const steps = [
     {
-      step: 1,
-      title: "Browse Services",
-      description: "Choose from 100+ home services",
-      icon: Search,
+      title: "Tell us what you need",
+      description: "Select a service and share your preferred time.",
     },
     {
-      step: 2,
-      title: "Book Appointment",
-      description: "Select date, time, and professional",
-      icon: CheckCircle,
+      title: "Get matched instantly",
+      description: "We assign the best local pro based on skills and reviews.",
     },
     {
-      step: 3,
-      title: "Relax",
-      description: "Let our verified experts handle it",
-      icon: Star,
+      title: "Relax while we handle it",
+      description: "Track the visit and pay securely once the job is done.",
     },
   ];
 
   const testimonials = [
     {
-      name: "Priya Sharma",
-      rating: 5,
-      comment: "Excellent service! The cleaning was thorough and professional.",
-      service: "Home Cleaning",
+      name: "Maya Al Zahra",
+      role: "Dubai Marina",
+      quote:
+        "ServiceHub booked my AC repair in under 10 minutes. The technician was punctual and professional.",
     },
     {
-      name: "Rahul Verma",
-      rating: 5,
-      comment: "Quick AC repair. Technician was skilled and courteous.",
-      service: "AC Repair",
+      name: "Omar Haddad",
+      role: "Business Bay",
+      quote:
+        "Transparent pricing and quick support. I love how easy it is to rebook trusted providers.",
     },
     {
-      name: "Anita Desai",
-      rating: 5,
-      comment: "Best salon experience at home. Highly recommended!",
-      service: "Beauty Services",
+      name: "Sophia Khan",
+      role: "Downtown Dubai",
+      quote:
+        "My apartment has never looked better. The team arrived on time and delivered a flawless clean.",
     },
   ];
 
   return (
-    <div className="min-h-screen">
-      {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-50">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="text-2xl font-bold text-primary">
-              ServiceHub
-            </Link>
-            <nav className="hidden md:flex items-center gap-6">
-              <Link href="/services" className="text-sm hover:text-primary">
-                Services
-              </Link>
-              <Link href="/about" className="text-sm hover:text-primary">
-                About
-              </Link>
-              <Link href="/contact" className="text-sm hover:text-primary">
-                Contact
-              </Link>
-              <Link
-                href="/provider/register"
-                className="text-sm hover:text-primary"
-              >
-                Become a Professional
-              </Link>
-            </nav>
-            <div className="flex items-center gap-3">
-              <Link href="/login">
-                <Button variant="ghost" size="sm">
-                  Login
-                </Button>
-              </Link>
-              <Link href="/register">
-                <Button size="sm">Sign Up</Button>
-              </Link>
+    <div className="min-h-screen bg-slate-50">
+      <section className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-white to-orange-100">
+        <div className="pointer-events-none absolute -left-32 top-10 h-72 w-72 rounded-full bg-orange-200/40 blur-3xl" />
+        <div className="pointer-events-none absolute -right-24 top-40 h-72 w-72 rounded-full bg-amber-200/40 blur-3xl" />
+        <div className="mx-auto w-full max-w-6xl px-4 py-20 md:px-6">
+          <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr]">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-600">
+                ServiceHub Dubai
+              </p>
+              <h1 className="mt-4 text-4xl font-semibold text-slate-900 md:text-5xl">
+                Book trusted home services in Dubai in minutes
+              </h1>
+              <p className="mt-4 text-lg text-slate-600">
+                From AC repair to deep cleaning, ServiceHub connects you with verified
+                professionals and upfront AED pricing.
+              </p>
+              <div className="mt-8 flex flex-wrap items-center gap-4">
+                <Link
+                  href="/services"
+                  className="inline-flex items-center justify-center rounded-xl bg-orange-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-orange-500"
+                >
+                  Browse services
+                </Link>
+                <span className="text-sm font-semibold text-slate-500">
+                  Same-day slots available across Dubai
+                </span>
+              </div>
             </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-purple-50 to-blue-50 py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-5xl font-bold mb-6">
-              Home Services at Your Doorstep
-            </h1>
-            <p className="text-xl text-gray-600 mb-8">
-              Professional & verified service providers for all your home needs
-            </p>
-            <div className="max-w-2xl mx-auto">
-              <div className="flex gap-2 bg-white p-2 rounded-lg shadow-lg">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                  <Input
-                    placeholder="Search for services..."
-                    className="pl-10 border-0"
-                  />
+            <div className="rounded-3xl border border-orange-100 bg-white p-6 shadow-xl">
+              <div className="space-y-4">
+                <div className="rounded-2xl bg-orange-50 px-4 py-3 text-sm text-orange-700">
+                  4.8 average rating from 10k+ bookings
                 </div>
-                <Button size="lg">Search</Button>
-              </div>
-            </div>
-            <div className="mt-8 flex items-center justify-center gap-8">
-              <div className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-primary" />
-                <span className="text-sm">Verified Professionals</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-primary" />
-                <span className="text-sm">On-Time Guarantee</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Star className="h-5 w-5 text-primary" />
-                <span className="text-sm">4.8★ Average Rating</span>
+                <div className="grid gap-3">
+                  {[
+                    "AC repairs and maintenance",
+                    "Premium home cleaning",
+                    "Electrical and plumbing fixes",
+                  ].map((item) => (
+                    <div
+                      key={item}
+                      className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm"
+                    >
+                      <span className="font-medium text-slate-700">{item}</span>
+                      <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-orange-600">
+                        From AED 199
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="rounded-2xl border border-dashed border-orange-200 px-4 py-3 text-sm text-slate-500">
+                  Tell us your need and we will match you instantly.
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Categories Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            Popular Services
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {categories.map((category) => (
-              <Link
-                key={category.name}
-                href={`/services?category=${category.name}`}
-                className="bg-white p-6 rounded-xl border hover:shadow-lg transition-shadow text-center group"
-              >
-                <div className="text-5xl mb-3">{category.icon}</div>
-                <h3 className="font-semibold mb-1 group-hover:text-primary">
-                  {category.name}
-                </h3>
-                <p className="text-sm text-gray-500">{category.services}</p>
-              </Link>
-            ))}
-          </div>
+      <section className="mx-auto w-full max-w-6xl px-4 py-16 md:px-6">
+        <div className="grid gap-6 md:grid-cols-3">
+          {features.map((feature) => (
+            <div
+              key={feature.title}
+              className="rounded-2xl border border-orange-100 bg-white p-6 shadow-sm"
+            >
+              <div className="text-3xl">{feature.icon}</div>
+              <h3 className="mt-4 text-xl font-semibold text-slate-900">
+                {feature.title}
+              </h3>
+              <p className="mt-2 text-sm text-slate-500">
+                {feature.description}
+              </p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Featured Services */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            Featured Services
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {featuredServices.map((service) => (
-              <Link
+      <section className="bg-white py-16">
+        <div className="mx-auto w-full max-w-6xl px-4 md:px-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-600">
+                Popular Services
+              </p>
+              <h2 className="mt-3 text-3xl font-semibold text-slate-900">
+                Dubai loves these services
+              </h2>
+            </div>
+            <Link
+              href="/services"
+              className="text-sm font-semibold text-orange-600"
+            >
+              View all services
+            </Link>
+          </div>
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
+            {popularServices.map((service) => (
+              <div
                 key={service.id}
-                href={`/services/${service.id}`}
-                className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow group"
+                className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50"
               >
-                <div className="aspect-video bg-gray-200 relative overflow-hidden">
+                <div className="h-44 w-full bg-slate-200">
                   <img
                     src={service.image}
                     alt={service.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                    className="h-full w-full object-cover"
                   />
                 </div>
-                <div className="p-5">
-                  <h3 className="font-semibold text-lg mb-2 group-hover:text-primary">
+                <div className="space-y-3 p-5">
+                  <span className="rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-600">
+                    {service.category}
+                  </span>
+                  <h3 className="text-lg font-semibold text-slate-900">
                     {service.name}
                   </h3>
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="flex items-center gap-1 text-amber-500">
-                      <Star className="h-4 w-4 fill-current" />
-                      <span className="font-medium">{service.rating}</span>
-                    </div>
-                    <span className="text-sm text-gray-500">
-                      ({service.reviews} reviews)
+                  <div className="flex items-center justify-between text-sm text-slate-500">
+                    <span>Rating {service.rating.toFixed(1)}</span>
+                    <span className="text-base font-semibold text-orange-600">
+                      AED {service.price}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-2xl font-bold">₹{service.price}</span>
-                      <p className="text-xs text-gray-500">{service.duration}</p>
-                    </div>
-                    <Button size="sm">Book Now</Button>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            How It Works
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            {howItWorks.map((item) => (
-              <div key={item.step} className="text-center">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <item.icon className="h-8 w-8 text-primary" />
-                </div>
-                <div className="text-sm font-semibold text-primary mb-2">
-                  Step {item.step}
-                </div>
-                <h3 className="font-bold text-xl mb-2">{item.title}</h3>
-                <p className="text-gray-600">{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            What Our Customers Say
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white p-6 rounded-xl shadow-md">
-                <div className="flex items-center gap-1 mb-3">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="h-5 w-5 text-amber-500 fill-current"
-                    />
-                  ))}
-                </div>
-                <p className="text-gray-700 mb-4">{testimonial.comment}</p>
-                <div>
-                  <p className="font-semibold">{testimonial.name}</p>
-                  <p className="text-sm text-gray-500">{testimonial.service}</p>
+                  <Link
+                    href={`/services/${service.id}`}
+                    className="inline-flex w-full items-center justify-center rounded-xl border border-orange-200 px-4 py-2 text-sm font-semibold text-orange-600 transition hover:border-orange-300 hover:bg-orange-50"
+                  >
+                    Book now
+                  </Link>
                 </div>
               </div>
             ))}
@@ -289,122 +219,84 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Trust Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="bg-primary text-white rounded-2xl p-12 text-center">
-            <h2 className="text-3xl font-bold mb-4">Why Choose ServiceHub?</h2>
-            <div className="grid md:grid-cols-4 gap-8 mt-8">
-              <div>
-                <div className="text-4xl font-bold mb-2">10,000+</div>
-                <p className="text-purple-100">Verified Professionals</p>
-              </div>
-              <div>
-                <div className="text-4xl font-bold mb-2">5M+</div>
-                <p className="text-purple-100">Happy Customers</p>
-              </div>
-              <div>
-                <div className="text-4xl font-bold mb-2">100+</div>
-                <p className="text-purple-100">Services Available</p>
-              </div>
-              <div>
-                <div className="text-4xl font-bold mb-2">4.8★</div>
-                <p className="text-purple-100">Average Rating</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-white text-xl font-bold mb-4">ServiceHub</h3>
-              <p className="text-sm">
-                Your trusted partner for all home services. Professional,
-                verified, and reliable.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link href="/about" className="hover:text-white">
-                    About Us
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/careers" className="hover:text-white">
-                    Careers
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/blog" className="hover:text-white">
-                    Blog
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/press" className="hover:text-white">
-                    Press
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link href="/help" className="hover:text-white">
-                    Help Center
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/contact" className="hover:text-white">
-                    Contact Us
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/terms" className="hover:text-white">
-                    Terms of Service
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/privacy" className="hover:text-white">
-                    Privacy Policy
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">For Partners</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link href="/provider/register" className="hover:text-white">
-                    Become a Professional
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/provider/login" className="hover:text-white">
-                    Professional Login
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/partner" className="hover:text-white">
-                    Partner with Us
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-sm text-center">
-            <p>
-              &copy; {new Date().getFullYear()} ServiceHub. All rights reserved.
+      <section className="mx-auto w-full max-w-6xl px-4 py-16 md:px-6">
+        <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-600">
+              How it works
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold text-slate-900">
+              Three simple steps to a spotless home
+            </h2>
+            <p className="mt-4 text-sm text-slate-500">
+              Bookings take less than two minutes and updates land directly in
+              your dashboard.
             </p>
           </div>
+          <div className="space-y-4">
+            {steps.map((step, index) => (
+              <div
+                key={step.title}
+                className="flex items-start gap-4 rounded-2xl border border-orange-100 bg-white p-5"
+              >
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-600 text-sm font-semibold text-white">
+                  {index + 1}
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900">
+                    {step.title}
+                  </h3>
+                  <p className="mt-1 text-sm text-slate-500">{step.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </footer>
+      </section>
+
+      <section className="bg-gradient-to-br from-slate-900 via-slate-900 to-orange-900 py-16 text-white">
+        <div className="mx-auto w-full max-w-6xl px-4 md:px-6">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-200">
+              Testimonials
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold">
+              Trusted by busy Dubai residents
+            </h2>
+          </div>
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
+            {testimonials.map((testimonial) => (
+              <div
+                key={testimonial.name}
+                className="rounded-2xl border border-white/10 bg-white/5 p-6"
+              >
+                <p className="text-sm text-orange-100">{testimonial.quote}</p>
+                <div className="mt-4">
+                  <p className="font-semibold">{testimonial.name}</p>
+                  <p className="text-xs text-orange-200">{testimonial.role}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-6xl px-4 py-16 md:px-6">
+        <div className="rounded-3xl bg-orange-600 px-8 py-10 text-center text-white md:px-16">
+          <h2 className="text-3xl font-semibold">
+            Ready to book your next service?
+          </h2>
+          <p className="mt-3 text-sm text-orange-100">
+            Get matched with top-rated professionals across Dubai.
+          </p>
+          <Link
+            href="/services"
+            className="mt-6 inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-orange-600 transition hover:bg-orange-50"
+          >
+            Explore services
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }

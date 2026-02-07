@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 export interface AuthRequest extends Request {
   user?: {
-    userId: string;
-    email: string;
+    id: string;
     role: string;
   };
 }
@@ -17,14 +16,20 @@ const getJWTSecret = (): string => {
   return secret;
 };
 
-export const authenticateToken = (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-): void => {
+const extractBearerToken = (authHeader?: string) => {
+  if (!authHeader) {
+    return null;
+  }
+  const [scheme, token] = authHeader.split(' ');
+  if (scheme !== 'Bearer' || !token) {
+    return null;
+  }
+  return token;
+};
+
+export const auth = (req: AuthRequest, res: Response, next: NextFunction): void => {
   try {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    const token = extractBearerToken(req.headers.authorization);
 
     if (!token) {
       res.status(401).json({ message: 'Access token required' });
@@ -32,33 +37,32 @@ export const authenticateToken = (
     }
 
     const secret = getJWTSecret();
-    
-    jwt.verify(token, secret, (err: any, decoded: any) => {
-      if (err) {
-        res.status(403).json({ message: 'Invalid or expired token' });
-        return;
-      }
+    const decoded = jwt.verify(token, secret) as JwtPayload;
+    const userId = decoded.id || decoded.userId;
+    const role = decoded.role;
 
-      req.user = decoded;
-      next();
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Internal server error' });
+    if (!userId || !role) {
+      res.status(401).json({ message: 'Invalid or expired token' });
+      return;
+    }
+
+    req.user = { id: String(userId), role: String(role) };
+    next();
+  } catch {
+    res.status(401).json({ message: 'Invalid or expired token' });
   }
 };
 
-export const authorizeRole = (...roles: string[]) => {
-  return (req: AuthRequest, res: Response, next: NextFunction): void => {
-    if (!req.user) {
-      res.status(401).json({ message: 'Not authenticated' });
-      return;
-    }
+export const isAdmin = (req: AuthRequest, res: Response, next: NextFunction): void => {
+  if (!req.user) {
+    res.status(401).json({ message: 'Not authenticated' });
+    return;
+  }
 
-    if (!roles.includes(req.user.role)) {
-      res.status(403).json({ message: 'Not authorized to access this resource' });
-      return;
-    }
+  if (req.user.role !== 'admin') {
+    res.status(403).json({ message: 'Not authorized to access this resource' });
+    return;
+  }
 
-    next();
-  };
+  next();
 };

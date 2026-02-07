@@ -5,6 +5,7 @@ export interface IService extends Document {
   slug: string;
   description: string;
   categoryId: mongoose.Types.ObjectId;
+  provider: mongoose.Types.ObjectId;
   basePrice: number;
   discountPercentage: number;
   durationMinutes: number;
@@ -40,6 +41,11 @@ const serviceSchema = new Schema<IService>(
     categoryId: {
       type: Schema.Types.ObjectId,
       ref: 'Category',
+      required: true,
+    },
+    provider: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
       required: true,
     },
     basePrice: {

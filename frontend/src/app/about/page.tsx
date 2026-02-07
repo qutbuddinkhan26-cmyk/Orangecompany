@@ -1,95 +1,143 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Shield, Users, Clock, Star, Award, Heart } from "lucide-react";
-
 export default function AboutPage() {
+  const stats = [
+    { label: "Services", value: "1000+" },
+    { label: "Providers", value: "500+" },
+    { label: "Bookings", value: "10,000+" },
+    { label: "Rating", value: "4.8" },
+  ];
+
+  const team = [
+    {
+      name: "Ayesha Rahman",
+      role: "Founder & CEO",
+      bio: "Hospitality leader focused on elevating everyday living in Dubai.",
+    },
+    {
+      name: "Hassan Malik",
+      role: "Head of Operations",
+      bio: "Builds reliable service delivery across the city with local partners.",
+    },
+    {
+      name: "Leila Noor",
+      role: "Customer Success Lead",
+      bio: "Ensures every ServiceHub booking feels effortless and personal.",
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="border-b bg-white sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold text-purple-600">ServiceHub</Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/services" className="text-gray-600 hover:text-purple-600">Services</Link>
-            <Link href="/about" className="text-purple-600 font-medium">About</Link>
-            <Link href="/contact" className="text-gray-600 hover:text-purple-600">Contact</Link>
-          </nav>
-          <div className="flex items-center gap-3">
-            <Link href="/login"><Button variant="outline">Login</Button></Link>
-            <Link href="/register"><Button>Sign Up</Button></Link>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero */}
-      <section className="bg-gradient-to-br from-purple-50 to-blue-50 py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">About ServiceHub</h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">We are on a mission to make professional home services accessible, affordable, and reliable for everyone.</p>
+    <div className="min-h-screen bg-slate-50">
+      <section className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-white to-orange-100 py-20">
+        <div className="pointer-events-none absolute -left-24 top-12 h-72 w-72 rounded-full bg-orange-200/40 blur-3xl" />
+        <div className="pointer-events-none absolute -right-24 top-20 h-72 w-72 rounded-full bg-amber-200/40 blur-3xl" />
+        <div className="mx-auto w-full max-w-4xl px-4 text-center md:px-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-600">
+            About ServiceHub
+          </p>
+          <h1 className="mt-4 text-4xl font-semibold text-slate-900 md:text-5xl">
+            A Dubai-based platform redefining home services
+          </h1>
+          <p className="mt-4 text-lg text-slate-600">
+            ServiceHub connects residents with vetted professionals for cleaning,
+            repairs, and maintenance - all with transparent pricing in AED.
+          </p>
         </div>
       </section>
 
-      {/* Mission */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold mb-6">Our Mission</h2>
-              <p className="text-gray-600 mb-4">ServiceHub was founded with a simple idea: everyone deserves access to quality home services at fair prices. We connect skilled professionals with customers who need their expertise.</p>
-              <p className="text-gray-600 mb-4">Our platform ensures that every service provider is verified, trained, and committed to delivering excellence. We handle the booking, payments, and quality assurance so you can focus on what matters most.</p>
-              <p className="text-gray-600">From home cleaning to electrical repairs, beauty services to pest control, we cover every aspect of home maintenance and care.</p>
+      <section className="mx-auto w-full max-w-6xl px-4 py-16 md:px-6">
+        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-600">
+              Our story
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold text-slate-900">
+              Built for fast-moving Dubai lives
+            </h2>
+            <p className="mt-4 text-sm text-slate-500">
+              ServiceHub started with a single idea: make reliable home services
+              feel as easy as ordering dinner. We partnered with top providers
+              across Dubai to deliver consistent quality, honest pricing, and
+              real-time support.
+            </p>
+            <p className="mt-4 text-sm text-slate-500">
+              Today, we help busy residents, families, and businesses book
+              everything from AC maintenance to handyman support with a few taps.
+            </p>
+          </div>
+          <div className="grid gap-4">
+            <div className="rounded-2xl border border-orange-100 bg-white p-6">
+              <p className="text-sm font-semibold text-slate-900">Mission</p>
+              <p className="mt-2 text-sm text-slate-500">
+                Deliver stress-free home services by matching residents with
+                trusted local professionals.
+              </p>
             </div>
-            <div className="bg-purple-100 rounded-2xl p-8">
-              <div className="grid grid-cols-2 gap-6">
-                <div className="text-center"><p className="text-4xl font-bold text-purple-600">10K+</p><p className="text-gray-600">Professionals</p></div>
-                <div className="text-center"><p className="text-4xl font-bold text-purple-600">5M+</p><p className="text-gray-600">Happy Customers</p></div>
-                <div className="text-center"><p className="text-4xl font-bold text-purple-600">100+</p><p className="text-gray-600">Services</p></div>
-                <div className="text-center"><p className="text-4xl font-bold text-purple-600">50+</p><p className="text-gray-600">Cities</p></div>
-              </div>
+            <div className="rounded-2xl border border-orange-100 bg-white p-6">
+              <p className="text-sm font-semibold text-slate-900">Vision</p>
+              <p className="mt-2 text-sm text-slate-500">
+                Become Dubai's most reliable home services ecosystem for every
+                household and business.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Values */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Our Values</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[{icon: Shield, title: "Trust & Safety", desc: "Every professional is background-verified and trained. Your safety is our top priority."},
-              {icon: Star, title: "Quality First", desc: "We maintain strict quality standards. Every service comes with a satisfaction guarantee."},
-              {icon: Clock, title: "On-Time Service", desc: "We respect your time. Our professionals arrive on schedule, every time."},
-              {icon: Heart, title: "Customer Care", desc: "24/7 customer support to help you with any questions or concerns."},
-              {icon: Award, title: "Fair Pricing", desc: "Transparent pricing with no hidden charges. Pay only for what you get."},
-              {icon: Users, title: "Community", desc: "We empower local professionals with training, tools, and a steady income."}].map((v, i) => (
-              <div key={i} className="bg-white p-6 rounded-xl shadow-sm">
-                <v.icon className="h-10 w-10 text-purple-600 mb-4" />
-                <h3 className="text-xl font-semibold mb-2">{v.title}</h3>
-                <p className="text-gray-600">{v.desc}</p>
+      <section className="bg-white py-16">
+        <div className="mx-auto w-full max-w-6xl px-4 md:px-6">
+          <div className="grid gap-6 md:grid-cols-4">
+            {stats.map((stat) => (
+              <div
+                key={stat.label}
+                className="rounded-2xl border border-orange-100 bg-orange-50 p-6 text-center"
+              >
+                <p className="text-3xl font-semibold text-orange-600">
+                  {stat.value}
+                </p>
+                <p className="mt-2 text-sm text-slate-500">{stat.label}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-16 bg-purple-600 text-white text-center">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-4">Ready to Experience the Difference?</h2>
-          <p className="text-purple-100 mb-8 text-lg">Join millions of satisfied customers who trust ServiceHub for their home service needs.</p>
-          <div className="flex gap-4 justify-center">
-            <Link href="/services"><Button className="bg-white text-purple-600 hover:bg-gray-100 px-8 py-3">Browse Services</Button></Link>
-            <Link href="/register"><Button variant="outline" className="border-white text-white hover:bg-purple-700 px-8 py-3">Join as Professional</Button></Link>
+      <section className="mx-auto w-full max-w-6xl px-4 py-16 md:px-6">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-600">
+              Team
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold text-slate-900">
+              The people behind ServiceHub
+            </h2>
           </div>
+          <p className="text-sm text-slate-500">
+            Passionate about craftsmanship, hospitality, and technology.
+          </p>
+        </div>
+        <div className="mt-8 grid gap-6 md:grid-cols-3">
+          {team.map((member) => (
+            <div
+              key={member.name}
+              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 text-lg font-semibold text-orange-600">
+                {member.name
+                  .split(" ")
+                  .map((part) => part[0])
+                  .slice(0, 2)
+                  .join("")}
+              </div>
+              <h3 className="mt-4 text-lg font-semibold text-slate-900">
+                {member.name}
+              </h3>
+              <p className="text-sm font-semibold text-orange-600">
+                {member.role}
+              </p>
+              <p className="mt-3 text-sm text-slate-500">{member.bio}</p>
+            </div>
+          ))}
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-8">
-        <div className="container mx-auto px-4 text-center">
-          <p>&copy; {new Date().getFullYear()} ServiceHub. All rights reserved.</p>
-        </div>
-      </footer>
     </div>
   );
 }

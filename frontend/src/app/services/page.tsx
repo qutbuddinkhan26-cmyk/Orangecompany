@@ -1,55 +1,224 @@
 "use client";
-import { useState } from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search, Star, Clock, ArrowLeft, Filter } from "lucide-react";
 
-const staticServices = [
-  { _id: "1", name: "Deep Home Cleaning", price: 999, rating: 4.8, reviewCount: 2534, duration: "3-4 hours", image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400", category: "Home Cleaning" },
-  { _id: "2", name: "AC Service & Repair", price: 499, rating: 4.7, reviewCount: 1823, duration: "1-2 hours", image: "https://images.unsplash.com/photo-1631545806609-fa7e4ad5c2e0?w=400", category: "Appliance Repair" },
-  { _id: "3", name: "Salon for Women", price: 799, rating: 4.9, reviewCount: 3421, duration: "2-3 hours", image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400", category: "Beauty & Spa" },
-  { _id: "4", name: "Plumbing Repair", price: 349, rating: 4.6, reviewCount: 987, duration: "1-2 hours", image: "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=400", category: "Plumbing" },
-  { _id: "5", name: "Electrical Work", price: 399, rating: 4.7, reviewCount: 1245, duration: "1-3 hours", image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400", category: "Electrical" },
-  { _id: "6", name: "Pest Control", price: 599, rating: 4.5, reviewCount: 756, duration: "2-3 hours", image: "https://images.unsplash.com/photo-1632935190868-ee68f0e9afb7?w=400", category: "Pest Control" },
-  { _id: "7", name: "Full Home Painting", price: 2999, rating: 4.6, reviewCount: 432, duration: "1-2 days", image: "https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=400", category: "Painting" },
-  { _id: "8", name: "Carpet Cleaning", price: 699, rating: 4.5, reviewCount: 654, duration: "2-3 hours", image: "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=400", category: "Home Cleaning" },
-  { _id: "9", name: "Furniture Assembly", price: 449, rating: 4.4, reviewCount: 321, duration: "1-3 hours", image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400", category: "Carpentry" },
-];
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { getServices } from "@/lib/api";
+
+type Service = {
+  _id: string;
+  name: string;
+  description?: string;
+  basePrice?: number;
+  rating?: number;
+  thumbnail?: string;
+  images?: string[];
+  category?: { name?: string };
+  categoryId?: { name?: string } | string;
+};
+
+const getCategoryName = (service: Service) => {
+  if (service.category?.name) {
+    return service.category.name;
+  }
+  if (typeof service.categoryId === "object" && service.categoryId?.name) {
+    return service.categoryId.name;
+  }
+  return "Other";
+};
+
+const getImageUrl = (service: Service) =>
+  service.thumbnail || service.images?.[0] || "";
 
 export default function ServicesPage() {
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [sort, setSort] = useState("popular");
-  const [category, setCategory] = useState("all");
-  const categories = ["all", ...Array.from(new Set(staticServices.map(s => s.category)))];
-  let filtered = staticServices.filter(s => s.name.toLowerCase().includes(search.toLowerCase()) && (category === "all" || s.category === category));
-  if (sort === "price-low") filtered.sort((a, b) => a.price - b.price);
-  else if (sort === "price-high") filtered.sort((a, b) => b.price - a.price);
-  else if (sort === "rating") filtered.sort((a, b) => b.rating - a.rating);
+  const [activeCategory, setActiveCategory] = useState("All");
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchServices = async () => {
+      try {
+        const data = (await getServices()) as Service[];
+        if (isMounted) {
+          setServices(data);
+        }
+      } catch (err) {
+        const message =
+          typeof err === "object" && err && "message" in err
+            ? String((err as { message?: string }).message)
+            : "Failed to load services.";
+        if (isMounted) {
+          setError(message);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchServices();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const categories = useMemo(() => {
+    const names = services.map(getCategoryName);
+    const unique = Array.from(new Set(names));
+    return ["All", ...unique];
+  }, [services]);
+
+  const filteredServices = useMemo(() => {
+    return services.filter((service) => {
+      const matchesSearch = service.name
+        .toLowerCase()
+        .includes(search.trim().toLowerCase());
+      const matchesCategory =
+        activeCategory === "All" ||
+        getCategoryName(service) === activeCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [services, search, activeCategory]);
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b bg-white sticky top-0 z-50"><div className="container mx-auto px-4 py-4 flex items-center justify-between"><Link href="/" className="text-2xl font-bold text-purple-600">ServiceHub</Link><div className="flex items-center gap-3"><Link href="/login"><Button variant="outline">Login</Button></Link><Link href="/register"><Button>Sign Up</Button></Link></div></div></header>
-      <div className="bg-gradient-to-r from-purple-50 to-blue-50 py-10"><div className="container mx-auto px-4"><Link href="/" className="text-purple-600 flex items-center gap-1 mb-4 text-sm"><ArrowLeft className="h-4 w-4" /> Back to Home</Link><h1 className="text-3xl font-bold mb-2">All Services</h1><p className="text-gray-600 mb-6">Browse our complete range of professional home services</p><div className="flex gap-2 max-w-xl"><div className="relative flex-1"><Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" /><Input className="pl-10" placeholder="Search services..." value={search} onChange={e => setSearch(e.target.value)} /></div><Button className="bg-purple-600 hover:bg-purple-700"><Search className="h-4 w-4 mr-2" />Search</Button></div></div></div>
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex flex-wrap items-center gap-3 mb-6">
-          <div className="flex items-center gap-2"><Filter className="h-4 w-4" /><span className="text-sm font-medium">Category:</span></div>
-          {categories.map(c => <button key={c} onClick={() => setCategory(c)} className={`text-sm px-3 py-1 rounded-full border ${category === c ? "bg-purple-600 text-white border-purple-600" : "bg-white hover:border-purple-300"}`}>{c === "all" ? "All" : c}</button>)}
-          <select value={sort} onChange={e => setSort(e.target.value)} className="ml-auto border rounded-lg px-3 py-1.5 text-sm"><option value="popular">Most Popular</option><option value="price-low">Price: Low to High</option><option value="price-high">Price: High to Low</option><option value="rating">Highest Rated</option></select>
-          <span className="text-sm text-gray-500">{filtered.length} services found</span>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6">{filtered.map(service => (
-          <Link key={service._id} href={`/services/${service._id}`} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-            <img src={service.image} alt={service.name} className="w-full h-48 object-cover" />
-            <div className="p-4">
-              <span className="text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">{service.category}</span>
-              <h3 className="font-semibold mt-2 mb-1">{service.name}</h3>
-              <div className="flex items-center gap-2 mb-2"><Star className="h-4 w-4 fill-yellow-400 text-yellow-400" /><span className="text-sm font-medium">{service.rating}</span><span className="text-xs text-gray-500">({service.reviewCount} reviews)</span></div>
-              <div className="flex items-center justify-between"><span className="text-lg font-bold text-purple-600">&#8377;{service.price}</span><span className="text-xs text-gray-500 flex items-center gap-1"><Clock className="h-3 w-3" />{service.duration}</span></div>
+    <div className="min-h-screen bg-slate-50">
+      <section className="border-b border-orange-100 bg-white">
+        <div className="mx-auto w-full max-w-6xl px-4 py-10 md:px-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-600">
+            Services
+          </p>
+          <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h1 className="text-3xl font-semibold text-slate-900">
+                Discover trusted professionals
+              </h1>
+              <p className="mt-2 text-sm text-slate-500">
+                Browse ServiceHub offerings and book the right expert in minutes.
+              </p>
             </div>
-          </Link>
-        ))}</div>
-      </div>
-      <footer className="bg-gray-900 text-gray-400 py-8 mt-8"><div className="container mx-auto px-4 text-center"><p>&copy; {new Date().getFullYear()} ServiceHub. All rights reserved.</p></div></footer>
+            <div className="flex w-full flex-col gap-2 md:w-auto md:min-w-[320px]">
+              <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                Search
+              </label>
+              <input
+                type="search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search by service name"
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
+              />
+            </div>
+          </div>
+
+          <div className="mt-6 flex flex-wrap gap-2">
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setActiveCategory(category)}
+                className={
+                  activeCategory === category
+                    ? "rounded-full bg-orange-600 px-4 py-2 text-sm font-semibold text-white"
+                    : "rounded-full border border-orange-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-orange-400 hover:text-orange-600"
+                }
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-6xl px-4 py-10 md:px-6">
+        {loading && (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div
+                key={`skeleton-${index}`}
+                className="overflow-hidden rounded-2xl border border-slate-200 bg-white"
+              >
+                <div className="h-44 w-full animate-pulse bg-slate-200" />
+                <div className="space-y-3 p-4">
+                  <div className="h-4 w-24 animate-pulse rounded bg-slate-200" />
+                  <div className="h-5 w-2/3 animate-pulse rounded bg-slate-200" />
+                  <div className="h-4 w-1/2 animate-pulse rounded bg-slate-200" />
+                  <div className="h-6 w-20 animate-pulse rounded bg-slate-200" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!loading && error && (
+          <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+            {error}
+          </div>
+        )}
+
+        {!loading && !error && filteredServices.length === 0 && (
+          <div className="rounded-2xl border border-orange-100 bg-white px-6 py-10 text-center">
+            <p className="text-lg font-semibold text-slate-900">No services found</p>
+            <p className="mt-2 text-sm text-slate-500">
+              Try a different search term or clear your filters.
+            </p>
+          </div>
+        )}
+
+        {!loading && !error && filteredServices.length > 0 && (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredServices.map((service) => (
+              <div
+                key={service._id}
+                className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-orange-200 hover:shadow-lg"
+              >
+                <div className="relative h-44 w-full overflow-hidden bg-slate-100">
+                  {getImageUrl(service) ? (
+                    <img
+                      src={getImageUrl(service)}
+                      alt={service.name}
+                      className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-sm text-slate-400">
+                      Image coming soon
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-3 p-4">
+                  <span className="inline-flex rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-600">
+                    {getCategoryName(service)}
+                  </span>
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900">
+                      {service.name}
+                    </h3>
+                    <p className="mt-1 text-sm text-slate-500 line-clamp-2">
+                      {service.description || "Professional service delivered by vetted experts."}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <p className="text-lg font-semibold text-orange-600">
+                      AED {service.basePrice ?? 0}
+                    </p>
+                    <div className="flex items-center gap-1 text-sm text-slate-500">
+                      <span className="text-orange-500">★</span>
+                      <span>{service.rating?.toFixed(1) ?? "4.6"}</span>
+                    </div>
+                  </div>
+                  <Link
+                    href={`/services/${service._id}`}
+                    className="inline-flex w-full items-center justify-center rounded-xl border border-orange-200 px-4 py-2 text-sm font-semibold text-orange-600 transition hover:border-orange-300 hover:bg-orange-50"
+                  >
+                    Book Now
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
